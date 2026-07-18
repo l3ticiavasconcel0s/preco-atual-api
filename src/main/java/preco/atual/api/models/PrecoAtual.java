@@ -7,5 +7,6 @@ public record PrecoAtual(
 		Long id,
 		String codigoAtivo,
 		BigDecimal preco,
-		LocalDateTime dataHoraAtualizacao) {
+		LocalDateTime dataHoraAtualizacao,
+		boolean atualizado) {
 }

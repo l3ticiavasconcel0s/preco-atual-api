@@ -13,14 +13,16 @@ public record PrecoAtualResponse(
 		@JsonProperty("codigo_ativo") String codigoAtivo,
 		BigDecimal preco,
 		@JsonProperty("data_hora_atualizacao")
-		@JsonFormat(pattern = "yyyy-MM-dd HH:mm:SSS")
-		LocalDateTime dataHoraAtualizacao) {
+		@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+		LocalDateTime dataHoraAtualizacao,
+		boolean atualizado) {
 
 	public static PrecoAtualResponse from(PrecoAtual precoAtual) {
 		return new PrecoAtualResponse(
 				precoAtual.id(),
 				precoAtual.codigoAtivo(),
 				precoAtual.preco(),
-				precoAtual.dataHoraAtualizacao());
+				precoAtual.dataHoraAtualizacao(),
+				precoAtual.atualizado());
 	}
 }

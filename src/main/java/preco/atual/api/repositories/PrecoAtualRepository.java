@@ -10,12 +10,11 @@ import preco.atual.api.models.PrecoAtual;
 @Repository
 public class PrecoAtualRepository {
 
-	private static final String SELECT_MAIS_RECENTE = """
-			SELECT id, codigo_ativo, preco, data_hora_atualizacao
+	private static final String SELECT_ATUAL = """
+			SELECT id, codigo_ativo, preco, data_hora_atualizacao, atualizado
 			FROM precos.precificacao
 			WHERE codigo_ativo = ?
-			ORDER BY data_hora_atualizacao DESC, id DESC
-			LIMIT 1
+			  AND atualizado = TRUE
 			""";
 
 	private final JdbcTemplate jdbcTemplate;
@@ -24,14 +23,15 @@ public class PrecoAtualRepository {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	public Optional<PrecoAtual> buscarMaisRecente(String codigoAtivo) {
+	public Optional<PrecoAtual> buscarAtual(String codigoAtivo) {
 		return jdbcTemplate.query(
-				SELECT_MAIS_RECENTE,
+				SELECT_ATUAL,
 				(rs, rowNum) -> new PrecoAtual(
 						rs.getLong("id"),
 						rs.getString("codigo_ativo"),
 						rs.getBigDecimal("preco"),
-						rs.getTimestamp("data_hora_atualizacao").toLocalDateTime()),
+						rs.getTimestamp("data_hora_atualizacao").toLocalDateTime(),
+						rs.getBoolean("atualizado")),
 				codigoAtivo)
 				.stream()
 				.findFirst();

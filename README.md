@@ -1,11 +1,29 @@
 # API de preço atual
 
-Microsserviço para consultar o preço atualizado mais recente de um ativo.
+Microsserviço para consultar a precificação ativa de um ativo.
 
 ## Endpoint
 
 ```text
-GET /v1/precos/preco-atual?codigo_ativo=ITAU3
+GET /preco-atual/v1/precos/ITAU3
+```
+
+Base URL pública:
+
+```text
+http://34.204.232.188/preco-atual/v1/precos
+```
+
+Exemplo de resposta:
+
+```json
+{
+  "id": 1,
+  "codigo_ativo": "PETR4",
+  "preco": 35.50,
+  "data_hora_atualizacao": "2026-07-17T10:30:00",
+  "atualizado": true
+}
 ```
 
 ## Configuração
@@ -13,7 +31,7 @@ GET /v1/precos/preco-atual?codigo_ativo=ITAU3
 Crie um arquivo `.env` na raiz:
 
 ```properties
-APP_PORT=8081
+APP_PORT=8080
 DB_URL=jdbc:postgresql://localhost:5432/precos
 DB_USERNAME=postgres
 DB_PASSWORD=change-me
@@ -34,12 +52,27 @@ Na primeira execução, gere o Gradle Wrapper usando o wrapper do serviço de in
 ## Dado para teste
 
 ```sql
-INSERT INTO precos.precificacao (codigo_ativo, preco)
-VALUES ('ITAU3', 100.01);
+INSERT INTO precos.precificacao (codigo_ativo, preco, atualizado)
+VALUES ('ITAU3', 100.01, TRUE);
 ```
 
+A consulta considera somente o registro com `atualizado = TRUE`. Quando não
+existe um registro ativo, a API retorna `404`.
+
 ```powershell
-curl.exe "http://localhost:8081/v1/precos/preco-atual?codigo_ativo=ITAU3"
+curl.exe "http://localhost:8080/preco-atual/v1/precos/ITAU3"
+```
+
+## Nginx
+
+```nginx
+location /preco-atual/ {
+    proxy_pass http://preco-atual-api:8080;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
 ```
 
 ## GitHub Secrets
@@ -59,4 +92,4 @@ Configure no repositório:
 2. Copie a versão criada.
 3. Execute `Deploy API` informando essa versão.
 
-O serviço será publicado na porta interna `8081` e conectado à rede Docker externa `app-network`.
+O serviço será publicado na porta interna `8080` e conectado à rede Docker externa `app-network`.

@@ -18,7 +18,7 @@ public class PrecoAtualService {
 
 	@Transactional(readOnly = true)
 	public PrecoAtualResponse buscarAtual(String codigoAtivo) {
-		return repository.buscarMaisRecente(codigoAtivo)
+		return repository.buscarAtual(codigoAtivo)
 				.map(PrecoAtualResponse::from)
 				.orElseThrow(() -> new PrecoAtualNotFoundException(codigoAtivo));
 	}

@@ -33,13 +33,14 @@ class PrecoAtualServiceTest {
 	}
 
 	@Test
-	void deveRetornarPrecoMaisRecente() {
+	void deveRetornarPrecoAtual() {
 		PrecoAtual preco = new PrecoAtual(
 				1L,
 				"ITAU3",
 				new BigDecimal("100.01"),
-				LocalDateTime.of(2026, 5, 5, 0, 0));
-		when(repository.buscarMaisRecente("ITAU3")).thenReturn(Optional.of(preco));
+				LocalDateTime.of(2026, 5, 5, 0, 0),
+				true);
+		when(repository.buscarAtual("ITAU3")).thenReturn(Optional.of(preco));
 
 		PrecoAtualResponse response = service.buscarAtual("ITAU3");
 
@@ -47,11 +48,12 @@ class PrecoAtualServiceTest {
 		assertEquals(preco.codigoAtivo(), response.codigoAtivo());
 		assertEquals(preco.preco(), response.preco());
 		assertEquals(preco.dataHoraAtualizacao(), response.dataHoraAtualizacao());
+		assertEquals(preco.atualizado(), response.atualizado());
 	}
 
 	@Test
 	void deveRetornarNotFoundQuandoNaoExistirPreco() {
-		when(repository.buscarMaisRecente("ITAU3")).thenReturn(Optional.empty());
+		when(repository.buscarAtual("ITAU3")).thenReturn(Optional.empty());
 
 		assertThrows(PrecoAtualNotFoundException.class, () -> service.buscarAtual("ITAU3"));
 	}
